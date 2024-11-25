@@ -1,0 +1,4 @@
+.env
+tailwind.config.js
+.venv
+db.sqlite3
