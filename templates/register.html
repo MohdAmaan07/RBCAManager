@@ -17,14 +17,58 @@
         <!-- Title -->
         <h2 class="text-3xl font-extrabold text-center text-gray-800 mb-8">Create Your Account</h2>
 
+        <!-- Success/Error -->
+        <div class="absolute top-10 left-0 w-full z-50">
+            <div class="container mx-auto py-8">
+            {% if messages %}
+                {% for message in messages %}
+                <div class="flex justify-center align-center" id="div_flash_{{ forloop.counter }}">
+                    <div class="flex w-fit items-center p-4 mb-4 text-sm border rounded-lg {% if message.tags == 'success' %}bg-teal-400{% else %}bg-red-500{% endif %}" role="alert">
+                    <img src="{% static 'svg/info.svg'%}" alt="">
+                    <span class="sr-only">Info</span>
+                    <div class="flex justify-center align-center gap-1">
+                        {{ message }}
+                        <button type="button" onclick="removeFlash('div_flash_{{ forloop.counter }}')">
+                            <img src="{% static 'svg/cross.svg'%}" alt="">
+                        </button>
+                    </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% endif %}
+            </div>
+        </div>
+        
+
         <!-- Form -->
         <form action="{% url 'register' %}" method="POST" class="space-y-6">
             {% csrf_token %}
             
+            <!-- First Name Input -->
+            <div>
+                <label for="firstName" class="block text-sm font-medium text-gray-700">First name</label>
+                <input type="text" name="first_name" id="firstName" required
+                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+
+            <!-- Last Name Input -->
+            <div>
+                <label for="lastName" class="block text-sm font-medium text-gray-700">Last Name</label>
+                <input type="text" name="last_name" id="lastName" required
+                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+
             <!-- Username Input -->
             <div>
                 <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
                 <input type="text" name="username" id="username" required
+                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            
+            <!-- E-mail Input -->
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700">E-mail</label>
+                <input type="text" name="email" id="email" required
                     class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
             </div>
 
@@ -34,12 +78,7 @@
                 <input type="password" name="password" id="password" required
                     class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
             </div>
-
-            <!-- Error Message -->
-            {% if error %}
-            <p class="text-red-500 text-sm mt-2">{{ error }}</p>
-            {% endif %}
-
+            
             <!-- Submit Button -->
             <button type="submit"
                 class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md transition duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
