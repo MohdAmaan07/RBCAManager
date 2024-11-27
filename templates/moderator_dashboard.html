@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{% static 'css/output.css' %}" rel="stylesheet">
+    <title>Moderator Dashboard</title>
+</head>
+
+<body class="bg-gray-100">
+    <!-- Success/Error -->
+    <div class="absolute top-10 left-0 w-full z-50">
+        <div class="container mx-auto py-8">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="flex justify-center align-center" id="div_flash_{{ forloop.counter }}">
+                        <div class="flex w-fit items-center p-4 mb-4 text-sm border rounded-lg {% if message.tags == 'success' %}bg-teal-400{% else %}bg-red-500{% endif %}" role="alert">
+                            <div class="flex justify-center align-center gap-1">
+                                <span class="text-white">{{ message }}</span>
+                                <button type="button" onclick="removeFlash('div_flash_{{ forloop.counter }}')">
+                                    <img src="{% static 'svg/cross.svg'%}" alt="">
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="bg-slate-800 p-4 shadow-lg text-white">
+        <div class="flex justify-between items-center">
+            <a href="{% url 'home' %}" class="text-2xl font-bold text-white hover:text-gray-300">RBCAManager</a>
+            <div>
+                <a href="{% url 'home' %}" class="mr-6 text-gray-300 hover:text-white transition">Home</a>
+                <a href="{% url 'profile' %}" class="mr-6 text-gray-300 hover:text-white transition">Profile</a>
+                <a href="{% url 'logout' %}" class="mr-6 text-gray-300 hover:text-white transition">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto p-8">
+        <h1 class="text-4xl font-bold mb-8">Moderator Dashboard</h1>
+
+        <!-- Access Logs Section -->
+        <div class="bg-blue-600 text-white p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Access Logs</h2>
+            <table class="w-full table-auto">
+                <thead>
+                    <tr>
+                        <th class="px-4 py-2">Action Time</th>
+                        <th class="px-4 py-2">User</th>
+                        <th class="px-4 py-2">Action</th>
+                        <th class="px-4 py-2">Content Type</th>
+                        <th class="px-4 py-2">Object</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                        <tr class="border-b border-gray-700">
+                            <td class="px-4 py-2">{{ log.action_time }}</td>
+                            <td class="px-4 py-2">{{ log.user }}</td>
+                            <td class="px-4 py-2">{{ log.get_action_flag_display }}</td>
+                            <td class="px-4 py-2">{{ log.content_type }}</td>
+                            <td class="px-4 py-2">{{ log.object_repr }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Sessions Section -->
+        <div class="bg-green-600 text-white p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Active Sessions</h2>
+            <table class="w-full table-auto">
+                <thead>
+                    <tr>
+                        <th class="px-4 py-2">Session Key</th>
+                        <th class="px-4 py-2">Session Data</th>
+                        <th class="px-4 py-2">Expire Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for session in sessions %}
+                        <tr class="border-b border-gray-700">
+                            <td class="px-4 py-2">{{ session.session_key }}</td>
+                            <td class="px-4 py-2">{{ session.get_decoded }}</td>
+                            <td class="px-4 py-2">{{ session.expire_date }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- User Management Section -->
+        <div class="bg-teal-600 text-white p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-2xl font-semibold mb-4">User Management</h2>
+            <a href="{% url 'admin:index' %}" class="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded">
+                Go to Admin Panel
+            </a>
+        </div>
+    </div>
+</body>
+
+</html>

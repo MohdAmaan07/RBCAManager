@@ -24,8 +24,6 @@
                 {% for message in messages %}
                 <div class="flex justify-center align-center" id="div_flash_{{ forloop.counter }}">
                     <div class="flex w-fit items-center p-4 mb-4 text-sm border rounded-lg {% if message.tags == 'success' %}bg-teal-400{% else %}bg-red-500{% endif %}" role="alert">
-                    <img src="{% static 'svg/info.svg'%}" alt="">
-                    <span class="sr-only">Info</span>
                     <div class="flex justify-center align-center gap-1">
                         {{ message }}
                         <button type="button" onclick="removeFlash('div_flash_{{ forloop.counter }}')">
@@ -81,7 +79,7 @@
             
             <!-- Submit Button -->
             <button type="submit"
-                class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md transition duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                class="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-md transition duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 Register
             </button>
         </form>
@@ -92,7 +90,7 @@
             <a href="{% url 'login' %}" class="text-blue-500 hover:underline">Login</a>
         </p>
     </div>
-
+    <script src="{% static 'js/script.js' %}"></script>
 </body>
 
 </html>

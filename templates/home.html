@@ -5,9 +5,59 @@
     {% load static %}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{% static 'css/output.css' %}" rel="stylesheet">
-    <title>Document</title>
+    <title>Home Page</title>
 </head>
-<body>
-    Hello, {{ user.username }}!
+<body class="bg-gray-100">
+    <!-- Navbar -->
+    <nav class="bg-slate-800 p-4 shadow-lg text-white">
+        <div class="flex justify-between items-center">
+            <a href="{% url 'home' %}" class="text-2xl font-bold text-white hover:text-gray-300">RBCAManager</a>
+            <div>
+                <a href="{% url 'home' %}" class="mr-6 text-gray-300 hover:text-white transition">Home</a>
+                <a href="{% url 'profile' %}" class="mr-6 text-gray-300 hover:text-white transition">Profile</a>
+                <a href="{% url 'logout' %}" class="mr-6 text-gray-300 hover:text-white transition">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto p-8">
+        <h1 class="text-4xl font-bold mb-8">Welcome to the Home Page!</h1>
+
+        <!-- Admin Section -->
+        {% if is_admin %}
+        <div class="bg-green-200 p-6 rounded-md mb-6">
+            <h2 class="text-xl font-semibold">Admin Dashboard</h2>
+            <p>You have admin privileges. Here you can manage users, roles, permissions, and other admin tasks.</p>
+            <!-- You can add more admin-related content here -->
+        </div>
+        {% endif %}
+
+        <!-- Moderator Section -->
+        {% if is_moderator %}
+        <div class="bg-yellow-200 p-6 rounded-md mb-6">
+            <h2 class="text-xl font-semibold">Moderator Dashboard</h2>
+            <p>You have moderator privileges. Here you can moderate content and manage roles.</p>
+            <!-- Moderator-related tasks -->
+        </div>
+        {% endif %}
+
+        <!-- User Section -->
+        {% if is_user %}
+        <div class="bg-blue-200 p-6 rounded-md mb-6">
+            <h2 class="text-xl font-semibold">User Dashboard</h2>
+            <p>You have standard user privileges. Here you can view content and interact with other users.</p>
+            <!-- User-related content -->
+        </div>
+        {% endif %}
+
+        <!-- If user has no specific group -->
+        {% if not is_admin and not is_moderator and not is_user %}
+        <div class="bg-red-100 p-6 rounded-md mb-6">
+            <h2 class="text-xl font-semibold">Access Denied</h2>
+            <p>You don't have permission to access this page.</p>
+        </div>
+        {% endif %}
+    </div>
 </body>
 </html>

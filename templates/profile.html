@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{% static 'css/output.css' %}" rel="stylesheet">
+    <title>Profile</title>
+</head>
+
+<body class="bg-gray-100">
+
+    <!-- Success/Error -->
+    <div class="absolute top-10 left-0 w-full z-50">
+        <div class="container mx-auto py-8">
+            {% if messages %}
+            {% for message in messages %}
+            <div class="flex justify-center align-center" id="div_flash_{{ forloop.counter }}">
+                <div class="flex w-fit items-center p-4 mb-4 text-sm border rounded-lg {% if message.tags == 'success' %}bg-teal-400{% else %}bg-red-500{% endif %}"
+                    role="alert">
+                    <div class="flex justify-center align-center gap-1">
+                        <span class="text-white">{{ message }}</span>
+                        <button type="button" onclick="removeFlash('div_flash_{{ forloop.counter }}')">
+                            <img src="{% static 'svg/cross.svg'%}" alt="">
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="bg-slate-800 p-4 shadow-lg text-white">
+        <div class="flex justify-between items-center">
+            <a href="{% url 'home' %}" class="text-2xl font-bold text-white hover:text-gray-300">RBCAManager</a>
+            <div>
+                <a href="{% url 'home' %}" class="mr-6 text-gray-300 hover:text-white transition">Home</a>
+                <a href="{% url 'profile' %}" class="mr-6 text-gray-300 hover:text-white transition">Profile</a>
+                <a href="{% url 'logout' %}" class="mr-6 text-gray-300 hover:text-white transition">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto p-8">
+        <h1 class="text-4xl font-bold mb-8">Profile</h1>
+
+        <!-- User Profile Section -->
+        <div class="bg-neutral-800 text-white p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-semibold mb-4">Your Profile</h2>
+            <form method="POST" action="{% url 'profile' %}">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label for="first_name" class="block text-sm font-medium mb-2">First Name</label>
+                    <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}"
+                        class="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="mb-4">
+                    <label for="last_name" class="block text-sm font-medium mb-2">Last Name</label>
+                    <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}"
+                        class="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium mb-2">Email</label>
+                    <input type="email" id="email" name="email" value="{{ user.email }}"
+                        class="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <button type="submit" class="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded">
+                    Update Profile
+                </button>
+            </form>
+        </div>
+
+        <!-- Admin/Moderator Section -->
+        {% if is_admin or is_moderator %}
+        <div class="bg-neutral-800 p-6 rounded-lg shadow-md mt-6 flex gap-2 flex-col">
+            <h2 class="text-2xl font-semibold mb-4 text-white">
+                {% if is_admin %}Manage Users{% else %}Moderator Tools{% endif %}
+            </h2>
+
+            {% if is_admin %}
+            <!-- Admin-specific tools -->
+            <a href="{% url 'admin:index' %}"
+                class="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded">
+                Go to Admin Panel
+            </a>
+            {% endif %}
+            {% if is_moderator or is_admin %}
+            <!-- Moderator-specific tools -->
+            <a href="{% url 'moderator_dashboard' %}"
+                class="bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded">
+                Go to Moderator Dashboard
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</body>
+
+</html>
