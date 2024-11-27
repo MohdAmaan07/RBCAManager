@@ -134,7 +134,6 @@ from django.contrib.auth.models import Group, Permission
 # Get the Moderator group
 moderator_group = Group.objects.get(name='moderator')
 
-# Filter and get specific permissions for Moderator (You can modify this list as needed)
 moderator_permissions = Permission.objects.filter(codename__in=[
     'view_logentry', 'view_group', 'view_permission', 'view_user',
     'view_roles', 'add_accessattempt', 'change_accessattempt', 'delete_accessattempt', 
@@ -143,7 +142,6 @@ moderator_permissions = Permission.objects.filter(codename__in=[
     'view_accesslog', 'add_session', 'change_session', 'delete_session', 'view_session'
 ])
 
-# Assign selected permissions to the Moderator group
 moderator_group.permissions.set(moderator_permissions)
 moderator_group.save()
 
