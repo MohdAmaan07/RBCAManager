@@ -1,5 +1,3 @@
-Here’s an updated version of your README with all the features you mentioned, as well as some extra details to guide anyone using or contributing to the project:
-
 ---
 
 # Project Name: User Authentication System
