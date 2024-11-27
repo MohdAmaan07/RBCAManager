@@ -131,7 +131,6 @@ print("Permissions for Admin group assigned.")
 ```python
 from django.contrib.auth.models import Group, Permission
 
-# Get the Moderator group
 moderator_group = Group.objects.get(name='moderator')
 
 moderator_permissions = Permission.objects.filter(codename__in=[
