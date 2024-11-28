@@ -150,6 +150,18 @@ moderator_group.save()
 print("Permissions for Moderator group assigned.")
 ```
 
+### API Endpoints:
+- **`/home/`**: Displays the home page for logged-in users with role-based content.
+- **`/register/`**: Allows new users to register with email verification via OTP.
+- **`/verify-otp/`**: Verifies the OTP sent to the user's email during registration or login.
+- **`/login/`**: Authenticates the user and logs them into the system.
+- **`/logout/`**: Logs the user out of the system.
+- **`/password-reset/`**: Initiates the password reset process by sending an OTP to the user's email.
+- **`/password-reset/verify/`**: Verifies the OTP and allows the user to reset their password.
+- **`/profile/`**: Displays and allows updating of the user’s profile.
+- **`/login-admin/`**: Auto-login for admin users to access the admin dashboard.
+- **`/moderator/dashboard/`**: Provides access to the moderator dashboard for managing logs and sessions.
+
 ### Notes:
 
 - **Admin Permissions**: Admin users should have full access to all model permissions in the system (e.g., view, add, change, delete).
