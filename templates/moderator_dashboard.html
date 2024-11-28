@@ -10,26 +10,6 @@
 </head>
 
 <body class="bg-gray-100">
-    <!-- Success/Error -->
-    <div class="absolute top-10 left-0 w-full z-50">
-        <div class="container mx-auto py-8">
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="flex justify-center align-center" id="div_flash_{{ forloop.counter }}">
-                        <div class="flex w-fit items-center p-4 mb-4 text-sm border rounded-lg {% if message.tags == 'success' %}bg-teal-400{% else %}bg-red-500{% endif %}" role="alert">
-                            <div class="flex justify-center align-center gap-1">
-                                <span class="text-white">{{ message }}</span>
-                                <button type="button" onclick="removeFlash('div_flash_{{ forloop.counter }}')">
-                                    <img src="{% static 'svg/cross.svg'%}" alt="">
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        </div>
-    </div>
-
     <!-- Navbar -->
     <nav class="bg-slate-800 p-4 shadow-lg text-white">
         <div class="flex justify-between items-center">

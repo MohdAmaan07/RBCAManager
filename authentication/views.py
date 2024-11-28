@@ -1,10 +1,11 @@
 import random
+from datetime import datetime, timedelta
 from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect
 from django.views.generic import View, TemplateView
 from django.contrib.auth.models import User, Group
 from django.contrib.sessions.models import Session
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, get_backends
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.mail import send_mail
@@ -12,7 +13,45 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.contrib.admin.models import LogEntry
-from django.contrib.auth.decorators import permission_required, login_required
+from django.contrib.auth.decorators import login_required
+from RBACManager import settings
+
+def send_otp(request, email, subject, message):
+    otp = random.randint(100000, 999999)
+    request.session['otp'] = otp
+    request.session['otp_timestamp'] = datetime.now().isoformat()
+    request.session['user_email'] = email
+
+    send_mail(
+        subject,
+        message + f' {otp}',
+        settings.EMAIL_HOST_USER,
+        [email],
+        fail_silently=False,
+    )
+
+def is_otp_expired(request, expiry_minutes=10):
+    otp_timestamp = request.session.get('otp_timestamp')
+    if otp_timestamp:
+        otp_time = datetime.fromisoformat(otp_timestamp)
+        if datetime.now() - otp_time > timedelta(minutes=expiry_minutes):
+            return True
+    return False
+
+def email_validator(request, email):
+    valid_email = set([
+        'gmail.com',
+        'yahoo.com',
+        'hotmail.com',
+        'outlook.com',
+        'protonmail.com',
+        'icloud.com',
+        'yandex.com',
+    ])
+    domain = email.split('@')[1]
+    
+    return domain in valid_email
+
 
 class HomeView(LoginRequiredMixin, TemplateView):
     template_name = 'home.html'
@@ -90,12 +129,14 @@ class LoginView(View):
         if not User.objects.filter(username=username).exists():
             messages.error(request, 'User not found')
             return redirect('register')
-
+        
         user = authenticate(request, username=username, password=password)
         if user is not None:
+            send_otp(request, User.objects.get(username=username).email, 'Login OTP', 'Your OTP for login is')
+            messages.info(request, 'An OTP has been sent to your email. Please verify.')
             request.session['role'] = user.groups.first().name
-            login(request, user)
-            return redirect('home')
+            request.session['temp_user_id'] = user.id
+            return redirect('verify_otp')
         else:
             messages.error(request, 'Invalid credentials')
             return redirect('login')
@@ -121,7 +162,9 @@ class RegisterView(View):
             messages.error(request, e)
             return redirect('register')
         
-        
+        if not email_validator(request, email):
+            messages.error(request, 'Invalid email domain. Please use a valid email address.')
+            return redirect('register')
         
         if User.objects.filter(username=username).exists():
             messages.error(request, 'Username already exists')
@@ -158,10 +201,34 @@ class VerifyOTPView(View):
     def post(self, request):
         entered_otp = request.POST.get('otp')
         session_otp = request.session.get('otp')
+        temp_user_id = request.session.get('temp_user_id')
+        
+        if not temp_user_id:
+            messages.error(request, 'Session expired. Please try again.')
+            return redirect('login')
+        
+        if is_otp_expired(request):
+            messages.error(request, 'OTP expired. Please request a new one.')
+            return redirect('verify_otp')
 
         if str(entered_otp) == str(session_otp):
             user_data = request.session.get('user_data')
-            if user_data:
+            if temp_user_id:
+                user = User.objects.filter(id=temp_user_id).first()
+                
+                backends = get_backends()
+                
+                if backends:
+                    user.backend = f"{backends[0].__module__}.{backends[0].__class__.__name__}"
+
+                login(request, user)
+                
+                del request.session['otp']
+                del request.session['temp_user_id']
+                
+                return redirect('home')
+                
+            elif user_data:
                 user = User.objects.create_user(
                     first_name=user_data['first_name'],
                     last_name=user_data['last_name'],
@@ -169,6 +236,7 @@ class VerifyOTPView(View):
                     email=user_data['email'],
                     password=user_data['password']
                 )
+                
                 default_group = Group.objects.get(name='Viewer')
                 user.groups.add(default_group)
                 messages.success(request, 'Registration successful! You can now log in.')
@@ -188,22 +256,12 @@ class PasswordResetRequestView(View):
     def post(self, request):
         email = request.POST.get('email')
         try:
-            user = User.objects.get(email=email)
+            User.objects.get(email=email)
         except User.DoesNotExist:
             messages.error(request, 'No account found with this email.')
             return redirect('password_reset_request')
 
-        otp = random.randint(100000, 999999)
-        request.session['otp'] = otp
-        request.session['user_email'] = email
-
-        send_mail(
-            'Password Reset OTP',
-            f'Your OTP for password reset is {otp}',
-            'your_email@example.com',
-            [email],
-            fail_silently=False,
-        )
+        send_otp(request, email, 'Password Reset OTP', 'Your OTP for password reset is')
 
         messages.info(request, 'An OTP has been sent to your email. Please check your inbox.')
         return redirect('password_reset_verify')

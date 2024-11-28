@@ -3,3 +3,4 @@ tailwind.config.js
 .venv
 db.sqlite3
 failed_login_attempts.log
+__pycache__/
