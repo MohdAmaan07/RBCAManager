@@ -147,9 +147,9 @@ moderator_group.save()
 print("Permissions for Moderator group assigned.")
 ```
 
-### API Endpoints  Documentation:
+## API Endpoints  Documentation:
 
-## Endpoints
+### Endpoints
 
 - **`/home/`**: Displays the home page for logged-in users with role-based content.
 - **`/register/`**: Allows new users to register with email verification via OTP.
